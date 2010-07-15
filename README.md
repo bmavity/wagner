@@ -1,2 +1,2 @@
-# papageno
-## An asyn context observation framework for JavaScript
+# wagner
+## A convention based composer for JavaScript
