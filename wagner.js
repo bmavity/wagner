@@ -27,68 +27,82 @@ var Wagner = (function(map) {
 		return that;
 	})();
 	
-	var composer = (function() {
-		var registeredItems = [],
-			resolvers = [],
-			defaultResolver = (function() {
-				var resolvedItems = {};
-
-				var createItem = function(parameterName) {
-					var creationFunction = registeredItems[parameterName],
-						resolvedItem = {};
-					creationFunction.apply(resolvedItem, map(componentConfig.getDependencies(parameterName), resolveComponent));
-					resolvedItems[parameterName] = resolvedItem;
-				};
-
-				var resolve = function(parameterName) {
-					if(!resolvedItems[parameterName]) {
-						createItem(parameterName);
-					}
-					return resolvedItems[parameterName];
-				};;
-
-				return {
-					resolve: resolve
-				};
-			})();
+	var resolverMania = (function() {
+		var resolvers = [],
+			resolverCache = {},
+			that = {};
 		
-		var addResolver = function(resolver) {
+		var addToCache = function(name) {
+			for(var i = 0; i < resolvers.length; i++) {
+				if(resolvers[i].canResolve(name)) {
+					resolverCache[name] = resolvers[i];
+					break;
+				}
+			}
+		};
+		
+		that.addResolver = function(resolver) {
 			resolvers.push(resolver);
 		};
 		
-		var register = function(componentName, creationFunction) {
-			registeredItems[componentName] = creationFunction;
-			componentConfig.addComponent(componentName, creationFunction);
-		};
-
-		var resolveComponent = function(componentName) {
-			for(var i = 0; i < resolvers.length; i++) {
-				if(resolvers[i].canResolve(componentName)) {
-					return resolvers[i].resolve(componentName);
-				}
+		that.hasResolver = function(name) {
+			if(!resolverCache[name]) {
+				addToCache(name);
 			}
-			return defaultResolver.resolve(componentName);
+			return resolverCache[name];
 		};
 		
-		return {
-			addResolver: addResolver,
-			register: register,
-			resolve: resolveComponent
+		that.resolve = function(name) {
+			return resolverCache[name].resolve(name);
 		};
+		
+		return that;
+	})();
+	
+	var composer = (function() {
+		var componentCache = {},
+			components = [],
+			that = {};
+		
+		var createComponent = function(name) {
+			var fn = components[name],
+				dependencies = map(componentConfig.getDependencies(name), resolve),
+				component = {};
+			fn.apply(component, dependencies);
+			return component;
+		};
+		
+		that.addComponent = function(name, fn) {
+			components[name] = fn;
+			componentConfig.addComponent(name, fn);
+		};
+		
+		var resolve = function(name) {
+			if(resolverMania.hasResolver(name)) {
+				return resolverMania.resolve(name);
+			}
+			if(!componentCache[name]) {
+				componentCache[name] = createComponent(name);
+			}
+			return componentCache[name];
+		};
+		that.resolve = resolve;
+		
+		return that;
 	})();
 
 	var compose = (function() {
-		return function(item, creationFunction) {
-			if(typeof(creationFunction) !== 'undefined') {
-				composer.register(item, creationFunction);
+		return function(name, fn) {
+			if(typeof(fn) !== 'undefined') {
+				composer.addComponent(name, fn);
 			} else {
-				return composer.resolve(item);
+				return composer.resolve(name);
 			}
 		};
 	})();
 
 	return {
-		addResolver: composer.addResolver,
+		addResolver: resolverMania.addResolver,
 		compose: compose
 	}
 })(function(sequence, fn, object) {
