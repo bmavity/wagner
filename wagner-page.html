@@ -6,20 +6,20 @@
 <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="wagner.js"></script>
 <script type="text/javascript">
-	compose('parent', function(child, sampleDomElement2) {
+	Wagner.compose('parent', function(child, sampleDomElement2) {
 		this.sayHello = function() {
 			sampleDomElement2.innerHTML = '<h1>Hi There</h1>';
 			child.doIt(sampleDomElement2);
 		}
 	});
 	
-	compose('child', function() {
+	Wagner.compose('child', function() {
 		this.doIt = function(domElement) {
 			domElement.innerHTML += '<p>From me too!</p>';
 		};
 	});
 	
-	compose('parent').sayHello();
+	Wagner.compose('parent').sayHello();
 </script>
 </body>
 </html>

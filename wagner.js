@@ -1,4 +1,6 @@
-var compose = (function($, map) {
+var Wagner = {};
+
+Wagner.compose = (function($, map) {
 	var componentConfig = (function() {
 		var functionRegEx = /\(([\s\S]*?)\)/,
 			dependencies = {},
