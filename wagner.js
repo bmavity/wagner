@@ -29,8 +29,7 @@ var Wagner = (function(map) {
 	
 	var composer = (function() {
 		var registeredItems = [],
-			resolvers = [],
-			that = {};
+			resolvers = [];
 		
 		var resolve = function(componentName) {
 			for(var i = 0; i < resolvers.length; i++) {
@@ -39,9 +38,8 @@ var Wagner = (function(map) {
 				}
 			}
 		};
-		that.resolve = resolve;
 		
-		that.register = function(componentName, creationFunction) {
+		var register = function(componentName, creationFunction) {
 			registeredItems[componentName] = creationFunction;
 			componentConfig.addComponent(componentName, creationFunction);
 		};
@@ -49,7 +47,6 @@ var Wagner = (function(map) {
 		var addResolver = function(resolver) {
 			resolvers.push(resolver);
 		};
-		that.addResolver = addResolver;
 		
 		addResolver({
 		    canResolve: function(parameterName) {
@@ -85,7 +82,11 @@ var Wagner = (function(map) {
 			return that;
 		})());
 		
-		return that;
+		return {
+			addResolver: addResolver,
+			register: register,
+			resolve: resolve
+		};
 	})();
 
 	var compose = (function() {
