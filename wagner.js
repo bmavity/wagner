@@ -117,11 +117,11 @@ var Wagner = (function(map) {
 
 (function() {
 	Wagner.addResolver({
-	    canResolve: function(parameterName) {
-		    return parameterName.indexOf('DomElement') !== -1;
+	    canResolve: function(name) {
+		    return name.indexOf('DomElement') !== -1;
 	    },
-	    resolve: function(parameterName) {
-		    return document.getElementById(parameterName.replace(' ', ''));
+	    resolve: function(name) {
+		    return document.getElementById(name.replace(' ', ''));
 		}
     });
 })();
@@ -129,11 +129,11 @@ var Wagner = (function(map) {
 
 (function($) {
 	Wagner.addResolver({
-	    canResolve: function(parameterName) {
-		    return parameterName.indexOf('$') === 0;
+	    canResolve: function(name) {
+		    return name.indexOf('$') === 0;
 	    },
-	    resolve: function(parameterName) {
-		    return $('#' +  parameterName.replace('$', ''));
+	    resolve: function(name) {
+		    return $('#' +  name.replace('$', ''));
 	    }
     });
 })(jQuery);
