@@ -1,4 +1,6 @@
 var Wagner = (function(map) {
+	var currentMapper;
+	
 	var componentConfig = (function() {
 		var functionRegEx = /\(([\s\S]*?)\)/,
 			dependencies = {},
@@ -22,6 +24,25 @@ var Wagner = (function(map) {
 		
 		that.getDependencies = function(name) {
 			return dependencies[name];
+		};
+		
+		return that;
+	})();
+	
+	var manualMapper = (function() {
+		var mappings = {},
+			that = {};
+		
+		that.addMapping = function(mapping) {
+			var name;
+			for(name in mapping) {
+				mappings[name] = mapping[name];
+			}
+			currentMapper = that;
+		};
+		
+		that.getDependencies = function(name) {
+			return mappings[name];
 		};
 		
 		return that;
@@ -66,7 +87,7 @@ var Wagner = (function(map) {
 		
 		var createComponent = function(name) {
 			var fn = components[name],
-				dependencies = map(componentConfig.getDependencies(name), resolve),
+				dependencies = map(currentMapper.getDependencies(name), resolve),
 				component = {};
 			fn.apply(component, dependencies);
 			return component;
@@ -100,6 +121,7 @@ var Wagner = (function(map) {
 	};
 
 	return {
+		addMapping: manualMapper.addMapping,
 		addResolver: resolverMania.addResolver,
 		compose: compose
 	};
