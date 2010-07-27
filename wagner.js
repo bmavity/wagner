@@ -29,63 +29,51 @@ var Wagner = (function(map) {
 	
 	var composer = (function() {
 		var registeredItems = [],
-			resolvers = [];
+			resolvers = [],
+			defaultResolver = (function() {
+				var resolvedItems = {};
+
+				var createItem = function(parameterName) {
+					var creationFunction = registeredItems[parameterName],
+						resolvedItem = {};
+					creationFunction.apply(resolvedItem, map(componentConfig.getDependencies(parameterName), resolveComponent));
+					resolvedItems[parameterName] = resolvedItem;
+				};
+
+				var resolve = function(parameterName) {
+					if(!resolvedItems[parameterName]) {
+						createItem(parameterName);
+					}
+					return resolvedItems[parameterName];
+				};;
+
+				return {
+					resolve: resolve
+				};
+			})();
 		
-		var resolve = function(componentName) {
-			for(var i = 0; i < resolvers.length; i++) {
-				if(resolvers[i].canResolve(componentName)) {
-					return resolvers[i].resolve(componentName);
-				}
-			}
+		var addResolver = function(resolver) {
+			resolvers.push(resolver);
 		};
 		
 		var register = function(componentName, creationFunction) {
 			registeredItems[componentName] = creationFunction;
 			componentConfig.addComponent(componentName, creationFunction);
 		};
-		
-		var addResolver = function(resolver) {
-			resolvers.push(resolver);
-		};
-		
-		addResolver({
-		    canResolve: function(parameterName) {
-			    return parameterName.indexOf('DomElement') !== -1;
-		    },
-		    resolve: function(parameterName) {
-			    return document.getElementById(parameterName.replace(' ', ''));
-			}
-	    });
-		
-		addResolver((function() {
-			var resolvedItems = {},
-				that = {};
-				
-			var createItem = function(parameterName) {
-				var creationFunction = registeredItems[parameterName],
-					resolvedItem = {};
-				creationFunction.apply(resolvedItem, map(componentConfig.getDependencies(parameterName), resolve));
-				resolvedItems[parameterName] = resolvedItem;
-			};
-			
-			that.canResolve = function(parameterName) {
-				return true;
-			};
-			
-			that.resolve = function(parameterName) {
-				if(!resolvedItems[parameterName]) {
-					createItem(parameterName);
+
+		var resolveComponent = function(componentName) {
+			for(var i = 0; i < resolvers.length; i++) {
+				if(resolvers[i].canResolve(componentName)) {
+					return resolvers[i].resolve(componentName);
 				}
-				return resolvedItems[parameterName];
-			};;
-			
-			return that;
-		})());
+			}
+			return defaultResolver.resolve(componentName);
+		};
 		
 		return {
 			addResolver: addResolver,
 			register: register,
-			resolve: resolve
+			resolve: resolveComponent
 		};
 	})();
 
@@ -111,6 +99,21 @@ var Wagner = (function(map) {
 	}
 	return result;
 });
+
+
+
+
+(function() {
+	Wagner.addResolver({
+	    canResolve: function(parameterName) {
+		    return parameterName.indexOf('DomElement') !== -1;
+	    },
+	    resolve: function(parameterName) {
+		    return document.getElementById(parameterName.replace(' ', ''));
+		}
+    });
+})();
+
 
 (function($) {
 	Wagner.addResolver({
