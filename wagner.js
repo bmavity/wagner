@@ -1,6 +1,4 @@
-var Wagner = {};
-
-Wagner.compose = (function($, map) {
+var Wagner = (function(map) {
 	var componentConfig = (function() {
 		var functionRegEx = /\(([\s\S]*?)\)/,
 			dependencies = {},
@@ -29,7 +27,7 @@ Wagner.compose = (function($, map) {
 		return that;
 	})();
 	
-	var createComposer = function() {
+	var composer = (function() {
 		var registeredItems = [],
 			resolvers = [],
 			that = {};
@@ -62,15 +60,6 @@ Wagner.compose = (function($, map) {
 			}
 	    });
 		
-	    addResolver({
-		    canResolve: function(parameterName) {
-			    return parameterName.indexOf('$') === 0;
-		    },
-		    resolve: function(parameterName) {
-			    return $('#' +  parameterName.replace('$', ''));
-		    }
-	    });
-		
 		addResolver((function() {
 			var resolvedItems = {},
 				that = {};
@@ -97,22 +86,38 @@ Wagner.compose = (function($, map) {
 		})());
 		
 		return that;
-	};
-	
-	var innerIoc = createComposer();
-	
-	return function(item, creationFunction) {
-		if(typeof(creationFunction) !== 'undefined') {
-			innerIoc.register(item, creationFunction);
-		} else {
-			return innerIoc.resolve(item);
-		}
-	};
-})(jQuery, function(sequence, fn, object) {
-    var len = sequence.length,
-        result = new Array(len);
-    for (var i = 0; i < len; i++) {
-        result[i] = fn.apply(object, [sequence[i], i]);
+	})();
+
+	var compose = (function() {
+		return function(item, creationFunction) {
+			if(typeof(creationFunction) !== 'undefined') {
+				composer.register(item, creationFunction);
+			} else {
+				return composer.resolve(item);
+			}
+		};
+	})();
+
+	return {
+		addResolver: composer.addResolver,
+		compose: compose
 	}
-    return result;
+})(function(sequence, fn, object) {
+	var len = sequence.length,
+		result = new Array(len);
+	for (var i = 0; i < len; i++) {
+		result[i] = fn.apply(object, [sequence[i], i]);
+	}
+	return result;
 });
+
+(function($) {
+	Wagner.addResolver({
+	    canResolve: function(parameterName) {
+		    return parameterName.indexOf('$') === 0;
+	    },
+	    resolve: function(parameterName) {
+		    return $('#' +  parameterName.replace('$', ''));
+	    }
+    });
+})(jQuery);
