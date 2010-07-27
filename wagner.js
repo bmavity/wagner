@@ -1,21 +1,36 @@
-var compose = (function(map) {
-	var createIoc = function() {
+var compose = (function($, map) {
+	var componentConfig = (function() {
 		var functionRegEx = /\(([\s\S]*?)\)/,
-			registeredItems = [],
-			resolvers = [],
+			dependencies = {},
 			that = {};
 		
-		var removeSpaces = function(param) {
-		    return param.replace(' ', '');
+		var removeSpaces = function(name) {
+		    return name.replace(' ', '');
 		};
 		
-		var getParameters = function(componentFunction) {
-			var parameters = functionRegEx.exec(componentFunction)[1];
-			if(!parameters) {
+		var parseDependencies = function(fn) {
+			var dependencyNames = functionRegEx.exec(fn)[1];
+			if(!dependencyNames) {
 				return [];
 			}
-			return map(parameters.split(','), removeSpaces);
+			return map(dependencyNames.split(','), removeSpaces);
 		};
+		
+		that.addComponent = function(name, fn) {
+			dependencies[name] = parseDependencies(fn);
+		};
+		
+		that.getDependencies = function(name) {
+			return dependencies[name];
+		};
+		
+		return that;
+	})();
+	
+	var createComposer = function() {
+		var registeredItems = [],
+			resolvers = [],
+			that = {};
 		
 		var resolve = function(componentName) {
 			for(var i = 0; i < resolvers.length; i++) {
@@ -28,6 +43,7 @@ var compose = (function(map) {
 		
 		that.register = function(componentName, creationFunction) {
 			registeredItems[componentName] = creationFunction;
+			componentConfig.addComponent(componentName, creationFunction);
 		};
 		
 		var addResolver = function(resolver) {
@@ -60,7 +76,7 @@ var compose = (function(map) {
 			var createItem = function(parameterName) {
 				var creationFunction = registeredItems[parameterName],
 					resolvedItem = {};
-				creationFunction.apply(resolvedItem, map(getParameters(creationFunction), resolve));
+				creationFunction.apply(resolvedItem, map(componentConfig.getDependencies(parameterName), resolve));
 				resolvedItems[parameterName] = resolvedItem;
 			};
 			
@@ -81,7 +97,7 @@ var compose = (function(map) {
 		return that;
 	};
 	
-	var innerIoc = createIoc();
+	var innerIoc = createComposer();
 	
 	return function(item, creationFunction) {
 		if(typeof(creationFunction) !== 'undefined') {
@@ -90,7 +106,7 @@ var compose = (function(map) {
 			return innerIoc.resolve(item);
 		}
 	};
-})(function(sequence, fn, object) {
+})(jQuery, function(sequence, fn, object) {
     var len = sequence.length,
         result = new Array(len);
     for (var i = 0; i < len; i++) {
