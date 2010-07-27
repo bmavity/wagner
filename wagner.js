@@ -1,7 +1,7 @@
 var Wagner = (function(map) {
 	var currentMapper;
 	
-	var componentConfig = (function() {
+	var autoMapper = (function() {
 		var functionRegEx = /\(([\s\S]*?)\)/,
 			dependencies = {},
 			that = {};
@@ -95,7 +95,7 @@ var Wagner = (function(map) {
 		
 		that.addComponent = function(name, fn) {
 			components[name] = fn;
-			componentConfig.addComponent(name, fn);
+			autoMapper.addComponent(name, fn);
 		};
 		
 		var resolve = function(name) {
@@ -120,6 +120,7 @@ var Wagner = (function(map) {
 		}
 	};
 
+	currentMapper = autoMapper;
 	return {
 		addMapping: manualMapper.addMapping,
 		addResolver: resolverMania.addResolver,
