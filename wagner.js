@@ -91,20 +91,18 @@ var Wagner = (function(map) {
 		return that;
 	})();
 
-	var compose = (function() {
-		return function(name, fn) {
-			if(typeof(fn) !== 'undefined') {
-				composer.addComponent(name, fn);
-			} else {
-				return composer.resolve(name);
-			}
-		};
-	})();
+	var compose = function(name, fn) {
+		if(typeof(fn) !== 'undefined') {
+			composer.addComponent(name, fn);
+		} else {
+			return composer.resolve(name);
+		}
+	};
 
 	return {
 		addResolver: resolverMania.addResolver,
 		compose: compose
-	}
+	};
 })(function(sequence, fn, object) {
 	var len = sequence.length,
 		result = new Array(len);
