@@ -6,25 +6,25 @@
 <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="wagner.js"></script>
 <script type="text/javascript">
-	Wagner.compose('parent', function(child, sampleDomElement) {
-		this.sayHello = function() {
-			sampleDomElement.innerHTML = '<h1>Hi There</h1>';
-			child.doIt(sampleDomElement);
-		}
-	});
-	
-	Wagner.compose('child', function($samplejQuery) {
-		this.doIt = function() {
-			$samplejQuery.html('<p>From me too!</p>');
-		};
-	});
-	
-//	Wagner.addMapping({
-//		'parent': ['child', 'sampleDomElement'],
-//		'child': ['$samplejQuery']
-//	});
-	
-	Wagner.compose('parent').sayHello();
+    Wagner.compose('parent', function(child, sampleDomElement) {
+        this.sayHello = function() {
+            sampleDomElement.innerHTML = '<h1>Hi There</h1>';
+            child.doIt(sampleDomElement);
+        }
+    });
+    
+    Wagner.compose('child', function($samplejQuery) {
+        this.doIt = function() {
+            $samplejQuery.html('<p>From me too!</p>');
+        };
+    });
+    
+//    Wagner.addMapping({
+//        'parent': ['child', 'sampleDomElement'],
+//        'child': ['$samplejQuery']
+//    });
+    
+    Wagner.compose('parent').sayHello();
 </script>
 </body>
 </html>
