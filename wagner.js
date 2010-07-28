@@ -1,3 +1,24 @@
+/*
+ * Map function taken from functional.js library
+ *
+ * Author: Oliver Steele
+ * Copyright: Copyright 2007 by Oliver Steele.  All rights reserved.
+ * License: MIT License
+ * Homepage: http://osteele.com/javascripts/functional
+ * Source: http://osteele.com/javascripts/functional/functional.js
+ * Changes: http://osteele.com/javascripts/functional/CHANGES
+ * Created: 2007-07-11
+ * Version: 1.0.2
+ *
+ * ---------------------------------------------------------------------
+ *
+ * Remainder of code:
+ * 
+ * Copyright: Copyright (c) 2010 Brian Mavity. All rights reserved.
+ * License: MIT License
+ *
+ */
+
 var Wagner = (function(map) {
 	var currentMapper;
 	
