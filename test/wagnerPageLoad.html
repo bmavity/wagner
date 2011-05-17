@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div id="sampleDomElement" style="background-color:#999"></div>
+<div id="samplejQuery"></div>
+<script type="text/javascript" src="../lib/browserEnv.js"></script>
+<script type="text/javascript">
+(function() {
+  var module = new wagner.Module(),
+      define = module.define;
+
+  define('parent', [], function(child, sampleDomElement) {
+    var sayHello = function() {
+      sampleDomElement.innerHTML = '<h1>Hi There</h1>';
+      child.doIt(sampleDomElement);
+    };
+
+    module.exports.sayHello = sayHello;
+  });
+})();
+  
+(function() {
+  var module = new wagner.Module(),
+      define = module.define;
+
+  define('child', [], function($samplejQuery) {
+    var doIt = function() {
+      $samplejQuery.html('<p>From me too!</p>');
+    };
+
+    module.exports.doIt = doIt;
+  });
+})();
+  
+(function() {
+  var module = new wagner.Module(),
+      define = module.define;
+
+  //wagner.addMapping({
+    //'parent': ['child', 'sampleDomElement'],
+    //'child': ['$samplejQuery']
+  //});
+})();
+</script>
+</body>
+</html>

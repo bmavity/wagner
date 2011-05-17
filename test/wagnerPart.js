@@ -19,7 +19,7 @@
  *
  */
 
-var Wagner = (function(map) {
+var Wagner = (function() {
     var currentMapper;
     
     var autoMapper = (function() {
@@ -36,7 +36,7 @@ var Wagner = (function(map) {
             if(!dependencyNames) {
                 return [];
             }
-            return map(dependencyNames.split(','), removeSpaces);
+            return dependencyNames.split(',').map(removeSpaces);
         };
         
         that.addComponent = function(name, fn) {
@@ -108,7 +108,7 @@ var Wagner = (function(map) {
         
         var createComponent = function(name) {
             var fn = components[name],
-                dependencies = map(currentMapper.getDependencies(name), resolve),
+                dependencies = currentMapper.getDependencies(name).map(resolve),
                 component = {};
             fn.apply(component, dependencies);
             return component;
@@ -147,16 +147,9 @@ var Wagner = (function(map) {
         addResolver: resolverMania.addResolver,
         compose: compose
     };
-})(function(sequence, fn, object) {
-    var len = sequence.length,
-        result = new Array(len);
-    for (var i = 0; i < len; i++) {
-        result[i] = fn.apply(object, [sequence[i], i]);
-    }
-    return result;
-});
+})();
 
-
+/*
 
 
 (function() {
@@ -181,3 +174,5 @@ var Wagner = (function(map) {
         }
     });
 })(jQuery);
+
+*/
