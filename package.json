@@ -1,0 +1,22 @@
+{
+  "author": "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)",
+  "contributors": [
+    "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
+  ],
+  "description": "Convention based Asychronous Modules",
+  "dependencies": {
+  },
+  "engines": {
+    "node": "~0.4.5"
+  },
+  "keywords": [
+    "amd"
+  ],
+  "main": "./lib/wagner.js",
+  "name": "wagner",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bmavity/wagner.git"
+  },
+  "version": "0.0.1"
+}
