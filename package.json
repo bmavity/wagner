@@ -5,18 +5,19 @@
   ],
   "description": "Convention based Asychronous Modules",
   "dependencies": {
+    "operatic": "0.0.1"
   },
   "engines": {
-    "node": "~0.4.5"
+    "node": "~0.6.0"
   },
   "keywords": [
     "amd"
   ],
-  "main": "./lib/wagner.js",
+  "main": "./lib/index.js",
   "name": "wagner",
   "repository": {
     "type": "git",
     "url": "git://github.com/bmavity/wagner.git"
   },
-  "version": "0.0.1"
+  "version": "0.1.0"
 }
