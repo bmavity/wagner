@@ -7,7 +7,10 @@
   "dependencies": {
     "operatic": "0.0.1"
   },
-  "engines": {
+  "directories": {
+    "bin": "./bin"
+  }
+, "engines": {
     "node": "~0.6.0"
   },
   "keywords": [
