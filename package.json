@@ -6,7 +6,7 @@
   "description": "Convention based Asychronous Modules",
   "dependencies": {
     "connect": "1.6.0"
-  , "operatic": "0.1.0"
+  , "operatic": "0.1.2"
   },
   "directories": {
     "bin": "./bin"
