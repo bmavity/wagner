@@ -6,6 +6,6 @@ var path = require('path')
   , filename = path.join(process.cwd(), process.argv[2])
   ;
   
-if(path.existsSync(filename)) {
+if(fs.existsSync(filename)) {
   require(filename);
 }
