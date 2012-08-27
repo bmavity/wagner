@@ -1,27 +1,26 @@
 {
-  "author": "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)",
-  "contributors": [
+  "author": "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
+, "contributors": [
     "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
-  ],
-  "description": "Convention based Asychronous Modules",
-  "dependencies": {
+  ]
+, "description": "Convention based portable Modules"
+, "dependencies": {
     "connect": "1.6.0"
-  , "operatic": "0.1.2"
-  },
-  "directories": {
+  }
+, "directories": {
     "bin": "./bin"
   }
 , "engines": {
     "node": ">=0.6.0"
-  },
-  "keywords": [
+  }
+, "keywords": [
     "amd"
-  ],
-  "main": "./lib/index.js",
-  "name": "wagner",
-  "repository": {
+  ]
+, "main": "./lib/index.js"
+, "name": "wagner"
+, "repository": {
     "type": "git",
     "url": "git://github.com/bmavity/wagner.git"
-  },
-  "version": "0.1.1"
+  }
+, "version": "0.2.0"
 }
