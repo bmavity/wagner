@@ -1,17 +1,22 @@
 {
   "author": "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
+, "bugs": {
+    "url": "https://github.com/bmavity/wagner/issues"
+  }
 , "contributors": [
     "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
   ]
 , "description": "Convention based portable Modules"
 , "dependencies": {
+  }
+, "devDependencies": {
     "connect": "1.6.0"
   }
 , "directories": {
     "bin": "./bin"
   }
 , "engines": {
-    "node": ">=0.6.0"
+    "node": "0.8.x"
   }
 , "keywords": [
     "amd"
