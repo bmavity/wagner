@@ -11,6 +11,7 @@
   }
 , "devDependencies": {
     "connect": "1.6.0"
+  , "papageno": "0.1.x"
   }
 , "directories": {
     "bin": "./bin"
