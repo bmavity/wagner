@@ -8,6 +8,7 @@
   ]
 , "description": "Convention based portable Modules"
 , "dependencies": {
+    "winston": "0.6.x"
   }
 , "devDependencies": {
     "papageno": "0.1.x"
