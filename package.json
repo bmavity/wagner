@@ -1,32 +1,27 @@
 {
-  "author": "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
+  "name": "wagner"
+, "author": "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
+, "repository": {
+    "type": "git",
+    "url": "git://github.com/bmavity/wagner.git"
+  }
 , "bugs": {
     "url": "https://github.com/bmavity/wagner/issues"
   }
 , "contributors": [
     "Brian Mavity <brian@brianmavity.com> (http://www.brianmavity.com)"
   ]
-, "description": "Convention based portable Modules"
+, "description": "Portable Components"
 , "dependencies": {
-    "winston": "0.6.x"
   }
 , "devDependencies": {
-    "papageno": "0.1.x"
-  }
-, "directories": {
-    "bin": "./bin"
   }
 , "engines": {
     "node": "0.8.x"
   }
 , "keywords": [
-    "amd"
   ]
-, "main": "./lib/index.js"
-, "name": "wagner"
-, "repository": {
-    "type": "git",
-    "url": "git://github.com/bmavity/wagner.git"
-  }
-, "version": "0.1.2"
+, "license": "Modified MIT"
+, "main": "./wagner.js"
+, "version": "0.3.0"
 }
