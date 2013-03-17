@@ -1,0 +1,70 @@
+var qs = require('querystring')
+	, http = require('http')
+
+function get(url, data, cb) {
+	var query = qs.stringify(data)
+		, path = url + (!!query ? '?' + query : '')
+		, opts = {
+				method: 'get'
+			, path: path
+			}
+		, req = http.request(opts, cb)
+	req.setHeader('accept', 'application/json')
+	req.end()
+}
+
+/*
+	req.setHeader('Content-Type', 'application/json')
+		req.setHeader('accept', 'application/json')
+*/
+
+function processResponse(res) {
+	var self = this
+
+	res.on('ready', function() {
+		console.log('ready')
+	})
+
+	res.on('data', function(data) {
+		self.emit('data', data)
+	})
+
+	res.on('error', function() {
+		console.log('error')
+	})
+	
+	res.on('close', function() {
+		console.log('close')
+	})
+	
+	res.on('end', function() {
+		console.log('end')
+	})
+
+	if(res.statusCode === 401) {
+		self.emit('unauthenticated')
+		console.log('unauthenticated')
+	}
+}
+
+function submitForm($form) {
+	var method = $form.attr('method').toLowerCase()
+		, action = $form.attr('action')
+		, self = this
+		, data = self.objectizeForm($form)
+	get(action, data, function(res) {
+		processResponse.call(self, res)
+	})
+}
+
+module.exports = function() {
+	var self = this
+	self.on('init', function(root) {
+		var $root = $(root)
+		$root.submit(function(evt) {
+			evt.preventDefault()
+			submitForm.call(self, $(evt.target).closest('form'))
+		})
+	})
+	return this
+}
