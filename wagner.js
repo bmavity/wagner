@@ -6,7 +6,7 @@ function extend(mixin) {
 }
 
 function Component(root) {
-	var root = document.getElementById(root)
+	this._root = root
 	/*
 	Object.defineProperty(this, '_root', {
 		value: root
@@ -14,15 +14,17 @@ function Component(root) {
 */
 	events.EventEmitter.call(this)
 
-	this.emit('init', root)
+	this.emit('init', this._root)
 }
 Component.extend = extend
 
 util.inherits(Component, events.EventEmitter)
 module.exports = function(id) {
-	return new Component(id)
+	var root = document.getElementById(id)
+	return new Component(root)
 }
 
 
 extend(require('./wagner.form.serialize'))
 extend(require('./wagner.form.submit'))
+extend(require('./wagner.fsm'))
