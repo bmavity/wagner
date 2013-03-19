@@ -1,5 +1,8 @@
 var qs = require('querystring')
 	, http = require('http')
+	, events = require('events')
+	, util = require('util')
+
 
 function get(url, data, cb) {
 	var query = qs.stringify(data)
@@ -18,7 +21,7 @@ function get(url, data, cb) {
 		req.setHeader('accept', 'application/json')
 */
 
-function processResponse(res) {
+function FormSubmissionResponse(component, res) {
 	var self = this
 
 	res.on('ready', function() {
@@ -42,10 +45,14 @@ function processResponse(res) {
 	})
 
 	if(res.statusCode === 401) {
-		self.emit('unauthenticated')
+		//self.emit('unauthenticated')
 		console.log('unauthenticated')
 	}
+
+	events.EventEmitter.call(this)
 }
+util.inherits(FormSubmissionResponse, events.EventEmitter)
+
 
 function submitForm($form) {
 	var method = $form.attr('method').toLowerCase()
@@ -53,7 +60,7 @@ function submitForm($form) {
 		, self = this
 		, data = self.objectizeForm($form)
 	get(action, data, function(res) {
-		processResponse.call(self, res)
+		self.emit('submitted', new FormSubmissionResponse(self, res))
 	})
 }
 
