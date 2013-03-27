@@ -4,6 +4,7 @@ function objectize($form) {
 		, $radioEles = $form.find('input[type="radio"]')
 		, $selects = $form.find('select')
 		, obj = {}
+
 	$textEles.each(function() {
 		var $ele = $(this)
 			, name = $ele.attr('name')
@@ -11,6 +12,7 @@ function objectize($form) {
 			obj[name] = $ele.val()
 		}
 	})
+
 	$checkboxEles.each(function() {
 		var $ele = $(this)
 			, name = $ele.attr('name')
@@ -19,6 +21,7 @@ function objectize($form) {
 			obj[name].push($ele.val())
 		}
 	})
+
 	$radioEles.each(function() {
 		var $ele = $(this)
 			, name = $ele.attr('name')
@@ -26,6 +29,7 @@ function objectize($form) {
 			obj[name] = $ele.val()
 		}
 	})
+
 	$selects.each(function() {
 		var $ele = $(this)
 			, name = $ele.attr('name')
@@ -33,11 +37,14 @@ function objectize($form) {
 			obj[name] = $ele.val()
 		}
 	})
+
 	return obj
 }
 
 
-module.exports = function() {
-	this.objectizeForm = objectize
+module.exports = function($form) {
+	this.objectizeForm = function() {
+		return objectize($form)
+	}
 	return this
 }

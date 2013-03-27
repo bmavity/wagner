@@ -1,25 +1,41 @@
-var qs = require('querystring')
+var url = require('url')
 	, http = require('http')
 	, events = require('events')
 	, util = require('util')
+	, formSerializer = require('./wagner.form.serialize')
+	, submitters = {
+			get: get
+		, post: post
+		}
 
-
-function get(url, data, cb) {
-	var query = qs.stringify(data)
-		, path = url + (!!query ? '?' + query : '')
-		, opts = {
+function get(path, data, cb) {
+	var pathUrl = url.parse(path)
+	if(cb) {
+		pathUrl.query = data
+	}
+	var opts = {
 				method: 'get'
-			, path: path
+			, path: url.format(pathUrl)
 			}
 		, req = http.request(opts, cb)
 	req.setHeader('accept', 'application/json')
 	req.end()
 }
 
-/*
+function post(path, data, cb) {
+	var pathUrl = url.parse(path)
+		, opts = {
+				method: 'post'
+			, path: url.format(pathUrl)
+			}
+		, req = http.request(opts, cb)
 	req.setHeader('Content-Type', 'application/json')
-		req.setHeader('accept', 'application/json')
-*/
+	req.setHeader('accept', 'application/json')
+	if(cb) {
+		req.write(JSON.stringy(data))
+	}
+	req.end()
+}
 
 function FormSubmissionResponse(component, res) {
 	var self = this
@@ -59,19 +75,18 @@ function submitForm($form) {
 		, action = $form.attr('action')
 		, self = this
 		, data = self.objectizeForm($form)
-	get(action, data, function(res) {
+	submitters[method](action, data, function(res) {
 		self.emit('submitted', new FormSubmissionResponse(self, res))
 	})
 }
 
-module.exports = function() {
+module.exports = function($root) {
 	var self = this
-	self.on('init', function(root) {
-		var $root = $(root)
-		$root.submit(function(evt) {
-			evt.preventDefault()
-			submitForm.call(self, $(evt.target).closest('form'))
-		})
+	formSerializer.call(self, $root)
+	$root.submit(function(evt) {
+		evt.preventDefault()
+		self.emit('submitting')
+		submitForm.call(self, $(evt.target).closest('form'))
 	})
 	return this
 }

@@ -5,9 +5,8 @@ function isNotDefault(state) {
 	return state !== 'default'
 }
 
-function componentStates() {
+function componentStates($root) {
 	var stateObj = {}
-		, $root
 		, fsm
 		, component = this
 		, allStates
@@ -19,7 +18,6 @@ function componentStates() {
 		})
 
 		allStates = Object.keys(stateObj).filter(isNotDefault).join(' ')
-		console.log(allStates)
 
 		_.reduce(stateObj, function(s, state) {
 			_.forEach(state, function(handler, evt) {
@@ -56,10 +54,6 @@ function componentStates() {
 		}
 		fsm.transition(nextState)
 	}
-
-	this.on('init', function(root) {
-		$root = $(root)
-	})
 
 	this.freezeStates = freezeStates
 	this.state = state
