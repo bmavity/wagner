@@ -32,7 +32,7 @@ function post(path, data, cb) {
 	req.setHeader('Content-Type', 'application/json')
 	req.setHeader('accept', 'application/json')
 	if(cb) {
-		req.write(JSON.stringy(data))
+		req.write(JSON.stringify(data))
 	}
 	req.end()
 }
