@@ -19,26 +19,13 @@ function componentStates($root) {
 
 		allStates = Object.keys(stateObj).filter(isNotDefault).join(' ')
 
-		_.reduce(stateObj, function(s, state) {
-			_.forEach(state, function(handler, evt) {
-				if(s.indexOf(evt) === -1 && s.indexOf('_') !== 0) {
-					s.push(evt)
-				}
-			})
-			return s
-		}, []).forEach(function(evt) {
-			component.on(evt, function(eventData) {
-				fsm.handle(evt, eventData)
-			})
+		component.on('*', function(eventData) {
+			fsm.handle(this.event, eventData)
 		})
 
-		if(this.sub) {
-			this.sub('*', function(data) {
-				console.log(this)
-				fsm.handle.call(fsm, this.event, data)
-				console.log(arguments)
-			})
-		}
+		this.sub('*', function(data) {
+			fsm.handle(this.event, data)
+		})
 	}
 
 	function state(name, handlers) {
