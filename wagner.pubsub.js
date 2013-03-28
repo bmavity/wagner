@@ -1,12 +1,12 @@
 var Emitter = require('events').EventEmitter
 	, emitter = new Emitter()
 
-function emit() {
+function pub() {
 	var args = [].slice.call(arguments, 0)
 	emitter.emit.apply(emitter, args)
 }
 
-function on() {
+function sub() {
 	var args = [].slice.call(arguments, 0)
 	emitter.on.apply(emitter, args)
 }
@@ -17,8 +17,8 @@ function once() {
 }
 
 module.exports = function($form) {
-	this.emit = emit
-	this.on = on
+	this.pub = pub
+	this.sub = sub
 	this.once = once
 	return this
 }
