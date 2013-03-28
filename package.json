@@ -13,7 +13,8 @@
   ]
 , "description": "Portable Components"
 , "dependencies": {
-		"machina": "0.3.x"
+		"eventemitter2": "0.4.x"
+	, "machina": "0.3.x"
 	, "underscore": "1.4.x"
   }
 , "devDependencies": {

@@ -32,11 +32,13 @@ function componentStates($root) {
 			})
 		})
 
-/*
-		this.subscribe('*', function() {
-			console.log(arguments)
-		})
-*/
+		if(this.sub) {
+			this.sub('*', function(data) {
+				console.log(this)
+				fsm.handle.call(fsm, this.event, data)
+				console.log(arguments)
+			})
+		}
 	}
 
 	function state(name, handlers) {

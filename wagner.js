@@ -1,4 +1,4 @@
-var events = require('events')
+var events = require('eventemitter2')
 	, util = require('util')
 
 function extend(mixin) {
@@ -16,11 +16,11 @@ function Component(rootId) {
 		value: root
 	})
 */
-	events.EventEmitter.call(this)
+	events.EventEmitter2.call(this)
 }
 Component.extend = extend
 
-util.inherits(Component, events.EventEmitter)
+util.inherits(Component, events.EventEmitter2)
 module.exports = Component
 /*
 function(id) {
