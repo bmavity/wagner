@@ -30,6 +30,7 @@ function(id) {
 */
 
 
+Component.evt = require('./wagner.eventDelegation')
 Component.formSubmitter = require('./wagner.form.submit')
 Component.fsm = require('./wagner.fsm')
 Component.pubsub = require('./wagner.pubsub')
