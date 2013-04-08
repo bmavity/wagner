@@ -1,41 +1,7 @@
-var url = require('url')
-	, http = require('http')
-	, events = require('events')
+var events = require('eventemitter2')
 	, util = require('util')
 	, formSerializer = require('./wagner.form.serialize')
-	, submitters = {
-			get: get
-		, post: post
-		}
-
-function get(path, data, cb) {
-	var pathUrl = url.parse(path)
-	if(cb) {
-		pathUrl.query = data
-	}
-	var opts = {
-				method: 'get'
-			, path: url.format(pathUrl)
-			}
-		, req = http.request(opts, cb)
-	req.setHeader('accept', 'application/json')
-	req.end()
-}
-
-function post(path, data, cb) {
-	var pathUrl = url.parse(path)
-		, opts = {
-				method: 'post'
-			, path: url.format(pathUrl)
-			}
-		, req = http.request(opts, cb)
-	req.setHeader('Content-Type', 'application/json')
-	req.setHeader('accept', 'application/json')
-	if(cb) {
-		req.write(JSON.stringify(data))
-	}
-	req.end()
-}
+	, http = require('./wagner.http')
 
 function FormSubmissionResponse(component, res) {
 	var self = this
@@ -65,9 +31,9 @@ function FormSubmissionResponse(component, res) {
 		console.log('unauthenticated')
 	}
 
-	events.EventEmitter.call(this)
+	events.EventEmitter2.call(this)
 }
-util.inherits(FormSubmissionResponse, events.EventEmitter)
+util.inherits(FormSubmissionResponse, events.EventEmitter2)
 
 
 function submitForm($form) {
@@ -75,18 +41,28 @@ function submitForm($form) {
 		, action = $form.attr('action')
 		, self = this
 		, data = self.objectizeForm($form)
-	submitters[method](action, data, function(res) {
+	http[method](action, data, function(res) {
 		self.emit('submitted', new FormSubmissionResponse(self, res))
 	})
 }
+
+function submitHandler($form) {
+  var self = this
+  self.emit('submitting')
+	submitForm.call(self, $form)
+}
+
 
 module.exports = function($root) {
 	var self = this
 	formSerializer.call(self, $root)
 	$root.submit(function(evt) {
 		evt.preventDefault()
-		self.emit('submitting')
-		submitForm.call(self, $(evt.target).closest('form'))
+	  var $form = $(evt.target).closest('form')
+	  
+	  if($form.hasClass('submitting') || $form.hasClass('submitted')) return
+	  
+	  submitHandler.call(self, $form)
 	})
 	return this
 }
