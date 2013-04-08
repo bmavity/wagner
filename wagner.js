@@ -10,24 +10,18 @@ function Component(rootId) {
 		return new Component(rootId)
 	}
 
-	this._root = $(document.getElementById(rootId))
-	/*
 	Object.defineProperty(this, '_root', {
-		value: root
+		value: $(document.getElementById(rootId))
 	})
-*/
-	events.EventEmitter2.call(this)
+
+	events.EventEmitter2.call(this, {
+		wildcard: true
+	})
 }
 Component.extend = extend
 
 util.inherits(Component, events.EventEmitter2)
 module.exports = Component
-/*
-function(id) {
-	var root = document.getElementById(id)
-	return new Component(root)
-}
-*/
 
 
 Component.evt = require('./wagner.eventDelegation')
