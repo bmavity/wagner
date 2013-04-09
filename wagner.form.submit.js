@@ -15,7 +15,7 @@ function FormSubmissionResponse(component, res) {
 	})
 
 	res.on('error', function() {
-		console.log('error')
+		self.emit('error')
 	})
 	
 	res.on('close', function() {
