@@ -29,9 +29,11 @@ function componentStates($root) {
 			fsm.handle(this.event, eventData)
 		})
 
-		this.sub('*', function(data) {
-			fsm.handle(this.event, data)
-		})
+		if(component.sub) {
+			component.sub('*', function(data) {
+				fsm.handle(this.event, data)
+			})
+		}
 	}
 
 	function state(name, handlers) {
