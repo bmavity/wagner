@@ -5,6 +5,12 @@ function isNotDefault(state) {
 	return state !== 'default'
 }
 
+function createTransitionTo(component, state) {
+	return function() {
+		component.transition(state)
+	}
+}
+
 function componentStates($root) {
 	var stateObj = {}
 		, fsm
@@ -33,7 +39,10 @@ function componentStates($root) {
 			handlers = name
 			name = 'default'
 		}
-		stateObj[name] = handlers
+		stateObj[name] = _.reduce(handlers, function(all, handler, evtName) {
+			all[evtName] = _.isString(handler) ? createTransitionTo(component, handler) : handler
+			return all
+		}, {})
 	}
 
 	function transition(nextState) {
