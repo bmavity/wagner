@@ -14,6 +14,10 @@ function Component(rootId) {
 		value: $(document.getElementById(rootId))
 	})
 
+	Object.defineProperty(this, '_$root', {
+		value: $(document.getElementById(rootId))
+	})
+
 	events.EventEmitter2.call(this, {
 		wildcard: true
 	})
@@ -27,4 +31,5 @@ module.exports = Component
 Component.evt = require('./wagner.eventDelegation')
 Component.formSubmitter = require('./wagner.form.submit')
 Component.fsm = require('./wagner.fsm')
+Component.ko = require('./wagner.ko')
 Component.pubsub = require('./wagner.pubsub')
