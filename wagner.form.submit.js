@@ -5,12 +5,10 @@ var events = require('eventemitter2')
 
 function FormSubmissionResponse(component, res) {
 	var self = this
-
-	res.on('ready', function() {
-		console.log('ready')
-	})
+		, resData = ''
 
 	res.on('data', function(data) {
+		resData += data
 		self.emit('data', data)
 	})
 
@@ -18,12 +16,8 @@ function FormSubmissionResponse(component, res) {
 		self.emit('error')
 	})
 	
-	res.on('close', function() {
-		console.log('close')
-	})
-	
 	res.on('end', function() {
-		console.log('end')
+		self.emit('end', JSON.parse(resData))
 	})
 
 	if(res.statusCode === 401) {
