@@ -1,0 +1,58 @@
+
+module.exports = function(formEle, submitEle) {
+	var form = formEle || this._$root[0]
+		, $submit = submitEle || this._$root.find('[type="submit"], .submit')
+		, component = this
+
+	function disableSubmit() {
+    $submit.removeClass('disabled')
+    $submit.attr('disabled', false)
+	}
+
+	function enableSubmit() {
+    $submit.addClass('disabled')
+    $submit.attr('disabled', true)
+	}
+
+	component.state({
+	  _onEnter: function() {
+	  	form.reset()
+	  	enableSubmit()
+	  }
+	, 'validating': 'validating'
+	, 'submitting': 'submitting'
+	})
+
+	component.state('validating', {
+	  _onEnter: disableSubmit
+	, 'submitting': 'submitting'
+	, 'invalid': 'invalid'
+	})
+
+	component.state('invalid', {
+	  _onEnter: enableSubmit
+	, 'validating': 'validating'
+	})
+
+	component.state('submitting', {
+	  _onEnter: disableSubmit
+	, 'submitted': function(res) {
+			res.on('data', function(data) {
+				component.emit('submission data', data)
+			})
+
+			res.on('end', function(result) {
+				console.log(result)
+				component.emit('submission result', result)
+			  component.transition('default')
+			})
+
+			res.on('error', function() {
+				component.emit('submission error')
+			  component.transition('default')
+			})
+		}
+	})
+
+	component.freezeStates()
+}

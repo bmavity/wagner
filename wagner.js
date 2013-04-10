@@ -29,6 +29,7 @@ module.exports = Component
 
 
 Component.evt = require('./wagner.eventDelegation')
+Component.formFsm = require('./wagner.form.fsm')
 Component.formSubmitter = require('./wagner.form.submit')
 Component.fsm = require('./wagner.fsm')
 Component.ko = require('./wagner.ko')
