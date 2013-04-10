@@ -5,13 +5,13 @@ module.exports = function(formEle, submitEle) {
 		, component = this
 
 	function disableSubmit() {
-    $submit.removeClass('disabled')
-    $submit.attr('disabled', false)
+    $submit.addClass('disabled')
+    $submit.attr('disabled', true)
 	}
 
 	function enableSubmit() {
-    $submit.addClass('disabled')
-    $submit.attr('disabled', true)
+    $submit.removeClass('disabled')
+    $submit.attr('disabled', false)
 	}
 
 	component.state({
