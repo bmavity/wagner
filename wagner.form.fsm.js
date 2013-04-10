@@ -42,7 +42,6 @@ module.exports = function(formEle, submitEle) {
 			})
 
 			res.on('end', function(result) {
-				console.log(result)
 				component.emit('submission result', result)
 			  component.transition('default')
 			})
@@ -53,6 +52,4 @@ module.exports = function(formEle, submitEle) {
 			})
 		}
 	})
-
-	component.freezeStates()
 }

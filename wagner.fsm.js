@@ -11,29 +11,27 @@ function createTransitionTo(component, state) {
 	}
 }
 
-function componentStates($root) {
+function ComponentFsm() {
+
+}
+
+function componentStates($rootEle) {
 	var stateObj = {}
-		, fsm
+		, fsm = new machina.Fsm({
+			  states: stateObj
+			})
 		, component = this
+		, $root = $rootEle || component._$root
 		, allStates
 
-	function freezeStates() {
-		fsm = new machina.Fsm({
-			initialState: 'default'
-		, states: stateObj
+	component.on('*', function(eventData) {
+		fsm.handle(this.event, eventData)
+	})
+
+	if(component.sub) {
+		component.sub('*', function(data) {
+			fsm.handle(this.event, data)
 		})
-
-		allStates = Object.keys(stateObj).filter(isNotDefault).join(' ')
-
-		component.on('*', function(eventData) {
-			fsm.handle(this.event, eventData)
-		})
-
-		if(component.sub) {
-			component.sub('*', function(data) {
-				fsm.handle(this.event, data)
-			})
-		}
 	}
 
 	function state(name, handlers) {
@@ -45,6 +43,12 @@ function componentStates($root) {
 			all[evtName] = _.isString(handler) ? createTransitionTo(component, handler) : handler
 			return all
 		}, {})
+		
+		allStates = Object.keys(stateObj).filter(isNotDefault).join(' ')
+
+		if(!fsm.state && !isNotDefault(name)) {
+			transition('default')
+		}
 	}
 
 	function transition(nextState) {
@@ -55,7 +59,7 @@ function componentStates($root) {
 		fsm.transition(nextState)
 	}
 
-	this.freezeStates = freezeStates
+
 	this.state = state
 	this.transition = transition
 	return this
