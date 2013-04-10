@@ -11,18 +11,46 @@ function createTransitionTo(component, state) {
 	}
 }
 
-function ComponentFsm() {
+function ComponentFsm(component) {
+	var fsm = new machina.Fsm({
+			  states: {}
+			})
+		, allStates
 
+	function addState(name, handlers) {
+		fsm.states[name] = _.reduce(handlers, function(all, handler, evtName) {
+			all[evtName] = _.isString(handler) ? createTransitionTo(component, handler) : handler
+			return all
+		}, {})
+		
+		allStates = Object.keys(fsm.states).filter(isNotDefault).join(' ')
+
+		if(!fsm.state && !isNotDefault(name)) {
+			transition('default')
+		}
+	}
+
+	function handle(evt, data) {
+		fsm.handle(evt, data)
+	}
+
+	function transition(nextState) {
+		component._$root.removeClass(allStates)
+		if(isNotDefault(nextState)) {
+			component._$root.addClass(nextState)
+		}
+		fsm.transition(nextState)
+	}
+
+
+	this.addState = addState
+	this.handle = handle
+	this.transition = transition
 }
 
-function componentStates($rootEle) {
-	var stateObj = {}
-		, fsm = new machina.Fsm({
-			  states: stateObj
-			})
-		, component = this
-		, $root = $rootEle || component._$root
-		, allStates
+function componentStates() {
+	var component = this
+		, fsm = new ComponentFsm(component)
 
 	component.on('*', function(eventData) {
 		fsm.handle(this.event, eventData)
@@ -39,24 +67,20 @@ function componentStates($rootEle) {
 			handlers = name
 			name = 'default'
 		}
-		stateObj[name] = _.reduce(handlers, function(all, handler, evtName) {
-			all[evtName] = _.isString(handler) ? createTransitionTo(component, handler) : handler
-			return all
-		}, {})
-		
-		allStates = Object.keys(stateObj).filter(isNotDefault).join(' ')
 
-		if(!fsm.state && !isNotDefault(name)) {
-			transition('default')
-		}
+		var nameParts = name.split('.')
+			, state = nameParts.pop()
+			, namespace = nameParts.join('.')
+
+		fsm.addState(state, handlers)
 	}
 
 	function transition(nextState) {
-		$root.removeClass(allStates)
-		if(isNotDefault(nextState)) {
-			$root.addClass(nextState)
-		}
-		fsm.transition(nextState)
+		var nameParts = nextState.split('.')
+			, state = nameParts.pop()
+			, namespace = nameParts.join('.')
+
+		fsm.transition(state)
 	}
 
 
