@@ -47,16 +47,18 @@ function submitHandler($form) {
 }
 
 
-module.exports = function($root) {
-	var self = this
-	formSerializer.call(self, $root)
+module.exports = function($rootEle) {
+	var component = this
+		, $root = $rootEle || component._$root
+	formSerializer.call(component, $root)
+
 	$root.submit(function(evt) {
 		evt.preventDefault()
 	  var $form = $(evt.target).closest('form')
 	  
 	  if($form.hasClass('submitting') || $form.hasClass('submitted')) return
 	  
-	  submitHandler.call(self, $form)
+	  submitHandler.call(component, $form)
 	})
 	return this
 }
