@@ -11,6 +11,14 @@ function createTransitionTo(component, state) {
 	}
 }
 
+function getStateParts(fullState) {
+	var nameParts = fullState.split('.')
+	return {
+	  state: nameParts.pop()
+	, namespace: nameParts.join('.')
+	}
+}
+
 function ComponentFsm(component) {
 	var fsm = new machina.Fsm({
 			  states: {}
@@ -39,7 +47,7 @@ function ComponentFsm(component) {
 		if(isNotDefault(nextState)) {
 			component._$root.addClass(nextState)
 		}
-		fsm.transition(nextState)
+		fsm.transition(getStateParts(nextState).state)
 	}
 
 
@@ -50,16 +58,24 @@ function ComponentFsm(component) {
 
 function componentStates() {
 	var component = this
-		, fsm = new ComponentFsm(component)
+		, fsms = {}
 
-	component.on('*', function(eventData) {
-		fsm.handle(this.event, eventData)
-	})
+	function getFsm(namespace) {
+		fsms[namespace] = fsms[namespace] || new ComponentFsm(component, namespace)
+		return fsms[namespace]
+	}
+
+	function handleEvent(data) {
+		var evt = this.event
+		_.forEach(fsms, function(fsm) {
+			fsm.handle(evt, data)
+		})
+	}
+
+	component.on('*', handleEvent)
 
 	if(component.sub) {
-		component.sub('*', function(data) {
-			fsm.handle(this.event, data)
-		})
+		component.sub('*', handleEvent)
 	}
 
 	function state(name, handlers) {
@@ -68,19 +84,12 @@ function componentStates() {
 			name = 'default'
 		}
 
-		var nameParts = name.split('.')
-			, state = nameParts.pop()
-			, namespace = nameParts.join('.')
-
-		fsm.addState(state, handlers)
+		var parts = getStateParts(name)
+		getFsm(parts.namespace).addState(parts.state, handlers)
 	}
 
 	function transition(nextState) {
-		var nameParts = nextState.split('.')
-			, state = nameParts.pop()
-			, namespace = nameParts.join('.')
-
-		fsm.transition(state)
+		getFsm(getStateParts(nextState).namespace).transition(nextState)
 	}
 
 

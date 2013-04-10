@@ -14,24 +14,24 @@ module.exports = function(formEle, submitEle) {
     $submit.attr('disabled', false)
 	}
 
-	component.state( 'wagner.form.default', {
+	component.state('wagner.form.default', {
 	  _onEnter: function() {
 	  	form.reset()
 	  	enableSubmit()
 	  }
-	, 'validating': 'validating'
-	, 'submitting': 'submitting'
+	, 'validating': 'wagner.form.validating'
+	, 'submitting': 'wagner.form.submitting'
 	})
 
 	component.state('wagner.form.validating', {
 	  _onEnter: disableSubmit
-	, 'submitting': 'submitting'
-	, 'invalid': 'invalid'
+	, 'submitting': 'wagner.form.submitting'
+	, 'invalid': 'wagner.form.invalid'
 	})
 
 	component.state('wagner.form.invalid', {
 	  _onEnter: enableSubmit
-	, 'validating': 'validating'
+	, 'validating': 'wagner.form.validating'
 	})
 
 	component.state('wagner.form.submitting', {
