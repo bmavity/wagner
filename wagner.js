@@ -10,12 +10,14 @@ function Component(rootId) {
 		return new Component(rootId)
 	}
 
+	var root = document.getElementById(rootId)
+
 	Object.defineProperty(this, '_root', {
-		value: $(document.getElementById(rootId))
+		value: root
 	})
 
 	Object.defineProperty(this, '_$root', {
-		value: $(document.getElementById(rootId))
+		value: $(root)
 	})
 
 	events.EventEmitter2.call(this, {

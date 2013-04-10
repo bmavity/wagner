@@ -1,6 +1,6 @@
 
 module.exports = function(formEle, submitEle) {
-	var form = formEle || this._$root[0]
+	var form = formEle || this._root
 		, $submit = submitEle || this._$root.find('[type="submit"], .submit')
 		, component = this
 

@@ -3,7 +3,7 @@ var ko = require('knockout')
 
 function knockoutDataBinder(schema, ele) {
 	var handlers = {}
-		, root = ele || this._$root[0]
+		, root = ele || this._root
 		, viewModel = schema
 		, self = this
 

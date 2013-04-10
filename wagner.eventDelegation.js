@@ -11,9 +11,9 @@ function createSelector(name) {
 	].join(',')
 }
 
-module.exports = function(root) {
+module.exports = function($rootEle) {
 	var handlers = {}
-		, $root = root || this._$root
+		, $root = $rootEle || this._$root
 		, self = this
 
 	function addHandler(name, handler) {
