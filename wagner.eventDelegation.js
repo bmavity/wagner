@@ -13,7 +13,7 @@ function createSelector(name) {
 
 module.exports = function(root) {
 	var handlers = {}
-		, $root = root || this._root
+		, $root = root || this._$root
 		, self = this
 
 	function addHandler(name, handler) {
@@ -21,9 +21,12 @@ module.exports = function(root) {
 	}
 
 	$root.click(function(evt) {
-		evt.preventDefault()
 		var $target = $(evt.target, $root)
 			, matchingHandler
+
+		if($target.attr('type') === 'submit') return
+		
+		evt.preventDefault()
 
 		function matchesHandler(name) {
 			if($target.closest(createSelector(name)).length) {
