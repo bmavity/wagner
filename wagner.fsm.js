@@ -43,11 +43,12 @@ function ComponentFsm(component) {
 	}
 
 	function transition(nextState) {
+		var state = getStateParts(nextState).state
 		component._$root.removeClass(allStates)
 		if(isNotDefault(nextState)) {
-			component._$root.addClass(nextState)
+			component._$root.addClass(state)
 		}
-		fsm.transition(getStateParts(nextState).state)
+		fsm.transition(state)
 	}
 
 
