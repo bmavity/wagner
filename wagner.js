@@ -1,16 +1,18 @@
 var events = require('eventemitter2')
 	, util = require('util')
+	, path = require('path')
 
 function extend(mixin) {
 	mixin.call(Component.prototype)
 }
 
-function Component(rootId) {
+function Component(rootPath) {
 	if(!(this instanceof Component)) {
-		return new Component(rootId)
+		return new Component(rootPath)
 	}
 
-	var root = document.getElementById(rootId)
+	var rootId = path.basename(rootPath, path.extname(rootPath))
+		, root = document.getElementById(rootId)
 
 	Object.defineProperty(this, '_root', {
 		value: root
