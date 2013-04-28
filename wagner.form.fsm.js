@@ -1,8 +1,9 @@
 
-module.exports = function(formEle, submitEle) {
-	var form = formEle || this._root
-		, $submit = submitEle || this._$root.find('[type="submit"], .submit')
+module.exports = function(opts) {
+	var form = this._root
+		, $submit = this._$root.find('[type="submit"], .submit')
 		, component = this
+	opts = opts || {}
 
 	function disableSubmit() {
     $submit.addClass('disabled')
@@ -16,7 +17,9 @@ module.exports = function(formEle, submitEle) {
 
 	component.state('wagner.form.default', {
 	  _onEnter: function() {
-	  	form.reset()
+	  	if(!opts.stopFormReset) {
+		  	form.reset()
+	  	}
 	  	enableSubmit()
 	  }
 	, 'validating': 'wagner.form.validating'
