@@ -11,9 +11,9 @@ function createSelector(name) {
 	].join(',')
 }
 
-module.exports = function($rootEle) {
+module.exports = function(opts) {
 	var handlers = {}
-		, $root = $rootEle || this._$root
+		, $root = this._$root
 		, self = this
 
 	function addHandler(name, handler) {
@@ -22,21 +22,28 @@ module.exports = function($rootEle) {
 
 	$root.click(function(evt) {
 		var $target = $(evt.target, $root)
+	    , $match
 			, matchingHandler
+		opts = opts || {}
 
-		if($target.attr('type') === 'submit') return
-		
-		evt.preventDefault()
+		if(!opts.captureSubmitClick) {
+			if($target.attr('type') === 'submit') {
+				return
+			}
+			evt.preventDefault()
+		}
 
 		function matchesHandler(name) {
-			if($target.closest(createSelector(name)).length) {
+			var $potentialMatch = $target.closest(createSelector(name))
+      if($potentialMatch.length) {
+        $match = $potentialMatch
 				matchingHandler = handlers[name]
 				return true
 			}
 		}
 
 		if(Object.keys(handlers).some(matchesHandler)) {
-			matchingHandler()
+			matchingHandler($match)
 		}
 	})
 
