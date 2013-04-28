@@ -47,7 +47,7 @@ function submitHandler($form) {
 }
 
 
-module.exports = function($rootEle) {
+module.exports = function($rootEle, opts) {
 	var component = this
 		, $root = $rootEle || component._$root
 	formSerializer.call(component, $root)
