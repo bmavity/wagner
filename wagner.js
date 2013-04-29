@@ -3,15 +3,24 @@ var events = require('eventemitter2')
 	, path = require('path')
 	, mixins = []
 
-var evt = require('./wagner.eventdelegation')
+var evt = require('./wagner.eventDelegation')
 	, formFsm = require('./wagner.form.fsm')
 	, formSubmitter = require('./wagner.form.submit')
 	, fsm = require('./wagner.fsm')
 	, ko = require('./wagner.ko')
-	, pubsub = require('./wagner.pubsub')
+
+var all = []
+	, whenForm = [
+			formSubmitter
+		, formFsm
+		]
 
 function extend(mixin) {
-	mixin.call(Component.prototype)
+	all.push(mixin)
+}
+
+function extendWhenForm(mixin) {
+	whenForm.push(mixin)
 }
 
 function Component(rootPath, options) {
@@ -21,7 +30,12 @@ function Component(rootPath, options) {
 
 	var rootId = path.basename(rootPath, path.extname(rootPath))
 		, root = document.getElementById(rootId)
+		, component = this
 	options = options || {}
+
+	function addBehavior(mixin) {
+		mixin.call(component, options)
+	}
 
 	Object.defineProperty(this, '_root', {
 		value: root
@@ -31,24 +45,25 @@ function Component(rootPath, options) {
 		value: $(root)
 	})
 
-	events.EventEmitter2.call(this, {
+	events.EventEmitter2.call(component, {
 		wildcard: true
 	})
 
-	pubsub.call(this)
-	evt.call(this, options)
-	fsm.call(this)
-
+	all.forEach(addBehavior)
 	if(root.nodeName.toLowerCase() === 'form') {
-		formSubmitter.call(this)
-		formFsm.call(this)
+		whenForm.forEach(addBehavior)
 	}
 
 	if(options.schema) {
-		ko.call(this, options.schema)
+		ko.call(component, options.schema)
 	}
 }
-Component.extend = extend
-
 util.inherits(Component, events.EventEmitter2)
+
+
 module.exports = Component
+module.exports.extend = extend
+module.exports.extendWhenForm = extendWhenForm
+module.exports.evt = evt
+module.exports.formSubmitter = formSubmitter
+module.exports.fsm = fsm
