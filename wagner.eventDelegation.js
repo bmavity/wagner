@@ -14,38 +14,45 @@ function createSelector(name) {
 module.exports = function(opts) {
 	var handlers = {}
 		, $root = this._$root
-		, self = this
+		, component = this
+		, isInitialized
 
 	function addHandler(name, handler) {
 		handlers[name] = handler
 	}
 
-	$root.click(function(evt) {
-		var $target = $(evt.target, $root)
-	    , $match
-			, matchingHandler
-		opts = opts || {}
+	function initHandler() {
+		if(isInitialized) return
 
-		if(!opts.captureSubmitClick) {
-			if($target.attr('type') === 'submit') {
-				return
+		$root.click(function(evt) {
+			var $target = $(evt.target, $root)
+		    , $match
+				, matchingHandler
+			opts = opts || {}
+
+			if(!opts.captureSubmitClick) {
+				if($target.attr('type') === 'submit') {
+					return
+				}
+				evt.preventDefault()
 			}
-			evt.preventDefault()
-		}
 
-		function matchesHandler(name) {
-			var $potentialMatch = $target.closest(createSelector(name))
-      if($potentialMatch.length) {
-        $match = $potentialMatch
-				matchingHandler = handlers[name]
-				return true
+			function matchesHandler(name) {
+				var $potentialMatch = $target.closest(createSelector(name))
+	      if($potentialMatch.length) {
+	        $match = $potentialMatch
+					matchingHandler = handlers[name]
+					return true
+				}
 			}
-		}
 
-		if(Object.keys(handlers).some(matchesHandler)) {
-			matchingHandler($match)
-		}
-	})
+			if(Object.keys(handlers).some(matchesHandler)) {
+				matchingHandler($match)
+			}
+		})
+
+		isInitialized = true
+	}
 
 	this.activate = addHandler
 	return this
