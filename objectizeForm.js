@@ -42,9 +42,4 @@ function objectize($form) {
 }
 
 
-module.exports = function($form) {
-	this.objectizeForm = function() {
-		return objectize($form)
-	}
-	return this
-}
+module.exports = objectize

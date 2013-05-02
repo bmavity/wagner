@@ -22,23 +22,22 @@ module.exports = function(opts) {
 	  	}
 	  	enableSubmit()
 	  }
-	, 'validating': 'wagner.form.validating'
 	, 'submitting': 'wagner.form.submitting'
 	})
 
 	component.state('wagner.form.validating', {
-	  _onEnter: disableSubmit
-	, 'submitting': 'wagner.form.submitting'
-	, 'invalid': 'wagner.form.invalid'
+	  'validated': 'wagner.form.submitting'
+	, 'invalidated': 'wagner.form.invalid'
 	})
 
 	component.state('wagner.form.invalid', {
 	  _onEnter: enableSubmit
-	, 'validating': 'wagner.form.validating'
+	, 'submitting': 'wagner.form.submitting'
 	})
 
 	component.state('wagner.form.submitting', {
 	  _onEnter: disableSubmit
+	, 'validating': 'wagner.form.validating'
 	, 'submitted': function(res) {
 			res.on('data', function(data) {
 				component.emit('submission data', data)

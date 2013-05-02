@@ -1,7 +1,20 @@
 var events = require('eventemitter2')
 	, util = require('util')
-	, formSerializer = require('./wagner.form.serialize')
+	, objectize = require('./objectizeForm')
 	, http = require('./wagner.http')
+
+function NulloValidationResponse() {
+	if(!(this instanceof NulloValidationResponse)) {
+		return new NulloValidationResponse()
+	}
+
+	var me = this
+	process.nextTick(function() {
+		me.emit('validated')
+	})
+	events.EventEmitter2.call(this)
+}
+util.inherits(NulloValidationResponse, events.EventEmitter2)
 
 function FormSubmissionResponse(component, res) {
 	var self = this
@@ -30,35 +43,46 @@ function FormSubmissionResponse(component, res) {
 util.inherits(FormSubmissionResponse, events.EventEmitter2)
 
 
-function submitForm($form) {
-	var method = $form.attr('method').toLowerCase()
-		, action = $form.attr('action')
-		, self = this
-		, data = self.objectizeForm($form)
-	http[method](action, data, function(res) {
-		self.emit('submitted', new FormSubmissionResponse(self, res))
-	})
-}
 
-function submitHandler($form) {
-  var self = this
-  self.emit('submitting')
-	submitForm.call(self, $form)
-}
-
-
-module.exports = function($rootEle, opts) {
+module.exports = function(options) {
 	var component = this
-		, $root = $rootEle || component._$root
-	formSerializer.call(component, $root)
+		, $root = component._$root
+	options = options || {}
+
+	component.validate = component.validate || NulloValidationResponse
+
+	function performSubmission($form) {
+		function submitForm() {
+			var method = $form.attr('method').toLowerCase()
+				, action = $form.attr('action')
+				, data = objectize($form)
+			http[method](action, data, function(res) {
+				component.emit('submitted', new FormSubmissionResponse(self, res))
+			})
+		}
+
+	  component.emit('submitting')
+
+		var validator = component.validate()
+		validator.once('validating', function() {
+			component.emit('validating')
+		})
+		validator.once('validated', function() {
+			component.emit('validated')
+			submitForm()
+		})
+		validator.once('invalidated', function(result) {
+			component.emit('invalidated')
+		})
+	}
 
 	$root.submit(function(evt) {
-		evt.preventDefault()
 	  var $form = $(evt.target).closest('form')
-	  
+	  if(!$form.length) return
+
+		evt.preventDefault()
 	  if($form.hasClass('submitting') || $form.hasClass('submitted')) return
-	  
-	  submitHandler.call(component, $form)
+	  performSubmission($form)
 	})
 	return this
 }
