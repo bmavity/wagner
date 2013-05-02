@@ -5,6 +5,7 @@ var events = require('eventemitter2')
 
 var evt = require('./wagner.eventDelegation')
 	, formFsm = require('./wagner.form.fsm')
+	, validate = require('./wagner.form.validate')
 	, formSubmitter = require('./wagner.form.submit')
 	, fsm = require('./wagner.fsm')
 	, ko = require('./wagner.ko')
@@ -12,6 +13,7 @@ var evt = require('./wagner.eventDelegation')
 var all = []
 	, whenForm = [
 			formSubmitter
+		, validate
 		, formFsm
 		]
 
@@ -53,10 +55,6 @@ function Component(rootPath, options) {
 	if(root.nodeName.toLowerCase() === 'form') {
 		whenForm.forEach(addBehavior)
 	}
-
-	if(options.schema) {
-		ko.call(component, options.schema)
-	}
 }
 util.inherits(Component, events.EventEmitter2)
 
@@ -67,3 +65,4 @@ module.exports.extendWhenForm = extendWhenForm
 module.exports.evt = evt
 module.exports.formSubmitter = formSubmitter
 module.exports.fsm = fsm
+module.exports.ko = ko
