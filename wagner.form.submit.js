@@ -30,7 +30,7 @@ function FormSubmissionResponse(component, res) {
 	})
 	
 	res.on('end', function() {
-		self.emit('end', JSON.parse(resData))
+		self.emit('end', resData && JSON.parse(resData))
 	})
 
 	if(res.statusCode === 401) {
@@ -67,8 +67,8 @@ module.exports = function(options) {
 		validator.once('validating', function() {
 			component.emit('validating')
 		})
-		validator.once('validated', function() {
-			component.emit('validated')
+		validator.once('validated', function(data) {
+			component.emit('validated', data)
 			submitForm()
 		})
 		validator.once('invalidated', function(result) {
