@@ -45,15 +45,29 @@ function transformToViewModel(schema) {
 	return vm
 }
 
-function knockoutDataBinder(schema, ele) {
+function knockoutDataBinder(schema) {
 	var handlers = {}
 		, root = this._root
-		, viewModel = transformToViewModel(schema)
-		, updater = new ViewModelUpdater(viewModel)
-	ko.applyBindings(viewModel, root)
+		, isBound
+		, viewModel
+		, updater
+	
+	function ensureBound(schema) {
+		if(!isBound) {
+			viewModel = transformToViewModel(schema)
+			updater = new ViewModelUpdater(viewModel)
+			ko.applyBindings(viewModel, root)
+			isBound = true
+		}
+	}
 
 	function update(values) {
+		ensureBound(values)
 		updater.update(values)
+	}
+
+	if(schema) {
+		ensureBound(schema)
 	}
 
 	this.update = update
