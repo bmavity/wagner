@@ -45,12 +45,13 @@ function transformToViewModel(schema) {
 	return vm
 }
 
-function knockoutDataBinder(schema) {
+function knockoutDataBinder(options) {
 	var handlers = {}
 		, root = this._root
 		, isBound
 		, viewModel
 		, updater
+	options = options || {}
 	
 	function ensureBound(schema) {
 		if(!isBound) {
@@ -66,8 +67,8 @@ function knockoutDataBinder(schema) {
 		updater.update(values)
 	}
 
-	if(schema) {
-		ensureBound(schema)
+	if(options.schema) {
+		ensureBound(options.schema)
 	}
 
 	this.update = update

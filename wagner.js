@@ -55,6 +55,10 @@ function Component(rootPath, options) {
 	if(root.nodeName.toLowerCase() === 'form') {
 		whenForm.forEach(addBehavior)
 	}
+
+	if(options.allowBinding) {
+		ko.call(component, options)
+	}
 }
 util.inherits(Component, events.EventEmitter2)
 
