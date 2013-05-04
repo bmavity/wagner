@@ -27,5 +27,5 @@
   ]
 , "license": "MIT +no-false-attribs, +no-advertising License"
 , "main": "./wagner.js"
-, "version": "0.5.1"
+, "version": "0.5.2"
 }
