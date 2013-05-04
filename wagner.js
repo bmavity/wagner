@@ -43,8 +43,9 @@ function Component(rootPath, options) {
 		value: root
 	})
 
+	var $root = $(root)
 	Object.defineProperty(this, '_$root', {
-		value: $(root)
+		value: $root
 	})
 
 	events.EventEmitter2.call(component, {
@@ -59,6 +60,15 @@ function Component(rootPath, options) {
 	if(options.allowBinding || options.bindWith) {
 		ko.call(component, options)
 	}
+
+	function getVal(name) {
+		var $ele = $root.find('[name="' + name + '"]')	
+		if($ele.length > 1) {
+			return $ele.filter(':checked').val()
+		}
+		return $ele.val()
+	}
+	this.getVal = getVal
 }
 util.inherits(Component, events.EventEmitter2)
 
