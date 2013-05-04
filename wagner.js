@@ -56,7 +56,7 @@ function Component(rootPath, options) {
 		whenForm.forEach(addBehavior)
 	}
 
-	if(options.allowBinding) {
+	if(options.allowBinding || options.bindWith) {
 		ko.call(component, options)
 	}
 }
