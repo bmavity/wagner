@@ -18,6 +18,7 @@ module.exports = function(opts) {
 		, isInitialized
 
 	function addHandler(name, handler) {
+		initHandler()
 		handlers[name] = handler
 	}
 
