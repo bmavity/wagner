@@ -1,6 +1,12 @@
 var ko = require('knockout')
 	, mapping = require('./ko-mapping')
 
+function oi(obj, cb) {
+	Object.keys(obj).forEach(function(key) {
+		cb(obj[key], key)
+	})
+}
+
 function knockoutDataBinder(options) {
 	var handlers = {}
 		, root = this._root
@@ -14,6 +20,11 @@ function knockoutDataBinder(options) {
 			viewModel = mapping.fromJS(obj)
 		}
 		ko.applyBindings(viewModel, root)
+		if(options.notifyOn) {
+			oi(options.notifyOn, function(fn, key) {
+				viewModel[key].subscribe(fn)
+			})
+		}
 	}
 
 	function ensureViewModel(schema) {
