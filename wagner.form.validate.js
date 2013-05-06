@@ -6,28 +6,32 @@ var util = require('util')
 function getRegexHandler(regex) {
 	return function(potentialVal, cb) {
 		var isValid = regex.test(potentialVal)
-		process.nextTick(function() {
-			cb(null, {
-				isValid: isValid
-			})
-		})
+		deferredResult(isValid, cb)
 	}
 }
 
 var whitespaceOnly = /^\s*$/
+	, deferredResult = function(isValid, cb) {
+			process.nextTick(function() {
+				cb(null, {
+					isValid: isValid
+				})
+			})
+		}
 
 var typeValidators = {
-		  guid: getRegexHandler(/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/)
+		  uuid: getRegexHandler(/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/)
 		, date: function(potentialDate, cb) {
 				var parsedDate = moment(potentialDate, ['YYYY-MM-DD', 'MM-DD-YYYY'])
 					, isValid = parsedDate && parsedDate.isValid()
-				process.nextTick(function() {
-					cb(null, {
-						isValid: isValid
-					})
-				})
+				deferredResult(isValid, cb)
+			}
+		, string: function(potentialString, cb) {
+				var isValid = Object.prototype.toString.call(potentialString) === '[object String]'
+				deferredResult(isValid, cb)
 			}
 		}
+typeValidators.guid = typeValidators.uuid
 
 function getValue(form, name) {
 	var ele = form.querySelector('[name="' + name + '"]')
