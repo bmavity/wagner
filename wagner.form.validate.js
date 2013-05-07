@@ -2,6 +2,7 @@ var util = require('util')
 	, events = require('eventemitter2')
 	, async = require('async')
 	, moment = require('moment')
+	, sarastro = require('sarastro')
 
 function getRegexHandler(regex) {
 	return function(potentialVal, cb) {
@@ -61,8 +62,13 @@ function shouldValidate(schemaEntry, val) {
 	if(!isRequired && hasValue(val)) return true
 }
 
-function FieldValidationResponse(form, schema) {
+function FieldValidationResponse(form, schema, messageValidator) {
 	var me = this
+		, validatorArgs
+	if(messageValidator) {
+		validatorArgs = sarastro(messageValidator)
+		validatorArgs.pop()
+	}
 
 	function init() {
 		me.emit('validating')
@@ -82,13 +88,16 @@ function FieldValidationResponse(form, schema) {
 						, val: val
 					}
 				})
-
 		function emitResult(err) {
 			if(err || !result.isValid) {
 				me.emit('invalidated', result)
 			} else {
 				me.emit('validated', result.data)
 			}
+		}
+
+		function getResultDataValue(name) {
+			return result.data[name]
 		}
 
 		function performFieldValidation(fieldValidator, cb) {
@@ -112,7 +121,24 @@ function FieldValidationResponse(form, schema) {
 			}
 		}
 
-		async.each(fieldValidators, performFieldValidation, emitResult)
+		function performMessageValidation(err) {
+			if(err) return emitResult(err)
+			if(!messageValidator) return emitResult()
+
+			var messageData = result.data
+				, argVals = validatorArgs.map(getResultDataValue)
+			argVals.push(function(err2, res) {
+				if(err2) return emitResult(err2)
+				if(!res.isValid) {
+					result.isValid = false
+					result.messageValidationFailed = true
+				}
+				emitResult()
+			})
+			messageValidator.apply({}, argVals)
+		}
+
+		async.each(fieldValidators, performFieldValidation, performMessageValidation)
 	}
 
 	events.EventEmitter2.call(this)
@@ -126,7 +152,7 @@ module.exports = function() {
 	var component = this
 
 	component.validate = function() {
-		return new FieldValidationResponse(component._root, component._schema)
+		return new FieldValidationResponse(component._root, component._schema, component._validate)
 	}
 
 	return component
