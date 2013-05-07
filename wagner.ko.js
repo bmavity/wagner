@@ -1,6 +1,17 @@
 var ko = require('knockout')
 	, mapping = require('./ko-mapping')
 
+ko.bindingHandlers.state = {
+	update: function(ele, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+		var allBindings = allBindingsAccessor()
+			, $ele = $(ele)
+		if(allBindingsAccessor.allStates) {
+			$ele.removeClass(allBindingsAccessor.allStates.join(' '))
+		}
+		$ele.addClass(ko.utils.unwrapObservable(valueAccessor()))
+	}
+}
+
 function oi(obj, cb) {
 	Object.keys(obj).forEach(function(key) {
 		cb(obj[key], key)
