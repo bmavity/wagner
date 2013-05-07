@@ -80,3 +80,4 @@ module.exports.evt = evt
 module.exports.formSubmitter = formSubmitter
 module.exports.fsm = fsm
 module.exports.ko = ko
+module.exports.http = require('./wagner.http')
