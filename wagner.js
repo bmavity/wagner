@@ -63,8 +63,15 @@ function Component(rootPath, options) {
 
 	function getVal(name) {
 		var $ele = $root.find('[name="' + name + '"]')	
+			, $checked
 		if($ele.length > 1) {
-			return $ele.filter(':checked').val()
+			$checked = $ele.filter(':checked')
+			if($checked.length === 1 && !$checked.is('[type="checkbox"]')) {
+				return $checked.val()
+			}
+			return $checked.map(function() {
+				return $(this).val()
+			}).get()
 		}
 		return $ele.val()
 	}
