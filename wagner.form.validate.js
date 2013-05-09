@@ -22,6 +22,11 @@ var whitespaceOnly = /^\s*$/
 
 var typeValidators = {
 		  uuid: getRegexHandler(/^(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}$/)
+		, array: function(potentialArray, cb) {
+				var isArray = Object.prototype.toString.call(potentialArray) === '[object Array]'
+					, isValid = isArray && !!potentialArray.length
+				deferredResult(isValid, cb)	
+			}
 		, date: function(potentialDate, cb) {
 				var parsedDate = moment(potentialDate, ['YYYY-MM-DD', 'MM-DD-YYYY'])
 					, isValid = parsedDate && parsedDate.isValid()
@@ -34,17 +39,33 @@ var typeValidators = {
 		}
 typeValidators.guid = typeValidators.uuid
 
-function getValue(form, name) {
-	var ele = form.querySelector('[name="' + name + '"]')
-	if(!ele) return null
-	return ele.value
+function isChecked(ele) {
+	return ele.checked
+}
 
-	var type = ele.nodeName.toLower()
-	if(type === 'input') {
-		return ele.value
+function resolveVal(ele) {
+	return ele.value
+}
+
+function toArray(arrayLike) {
+	return [].slice.call(arrayLike, 0)
+}
+
+function getValue(form, name) {
+	var nameSelector = '[name="' + name + '"]'
+		, checks = form.querySelectorAll('[type="checkbox"]' + nameSelector)
+	if(checks.length) {
+		return toArray(checks).filter(isChecked).map(resolveVal)
 	}
-	if(type === 'select') {
-		return ele
+		
+	var radios = form.querySelectorAll('[type="radio"]' + nameSelector)
+	if(radios.length) {
+		return resolveVal(toArray(radios).filter(isChecked)[0])
+	}
+
+	var single = form.querySelector(nameSelector)
+	if(single) {
+		return resolveVal(single)
 	}
 }
 
