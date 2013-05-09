@@ -16,31 +16,38 @@ function NulloValidationResponse() {
 }
 util.inherits(NulloValidationResponse, events.EventEmitter2)
 
-function FormSubmissionResponse(component, res) {
-	var self = this
-		, resData = ''
-
-	res.on('data', function(data) {
-		resData += data
-		self.emit('data', data)
-	})
-
-	res.on('error', function() {
-		self.emit('error')
-	})
-	
-	res.on('end', function() {
-		self.emit('end', resData && JSON.parse(resData))
-	})
-
-	if(res.statusCode === 401) {
-		//self.emit('unauthenticated')
-		console.log('unauthenticated')
+function HttpFormSubmissionResponse(formVals) {
+	if(!(this instanceof HttpFormSubmissionResponse)) {
+		return new HttpFormSubmissionResponse(formVals)
 	}
 
+	var me = this
+
 	events.EventEmitter2.call(this)
+
+	http[formVals.method](formVals.action, formVals.data, function(res) {
+		var resData = ''
+
+		res.on('data', function(data) {
+			resData += data
+			me.emit('data', data)
+		})
+
+		res.on('error', function() {
+			me.emit('error')
+		})
+		
+		res.on('end', function() {
+			me.emit('end', resData && JSON.parse(resData))
+		})
+
+		if(res.statusCode === 401) {
+			//self.emit('unauthenticated')
+			console.log('unauthenticated')
+		}
+	})
 }
-util.inherits(FormSubmissionResponse, events.EventEmitter2)
+util.inherits(HttpFormSubmissionResponse, events.EventEmitter2)
 
 
 
@@ -50,15 +57,19 @@ module.exports = function(options) {
 	options = options || {}
 
 	component.validate = component.validate || NulloValidationResponse
+	component.submissionResponse = component.submissionResponse || HttpFormSubmissionResponse
 
 	function performSubmission($form) {
 		function submitForm() {
 			var method = $form.attr('method').toLowerCase()
 				, action = $form.attr('action')
 				, data = objectize($form)
-			http[method](action, data, function(res) {
-				component.emit('submitted', new FormSubmissionResponse(self, res))
-			})
+				, res = component.submissionResponse({
+					  action: action
+					, data: data
+					, method: method
+					})
+			component.emit('submitted', res)
 		}
 
 	  component.emit('submitting')
