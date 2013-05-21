@@ -1,99 +1,41 @@
-var events = require('eventemitter2')
-	, util = require('util')
-	, objectize = require('./objectizeForm')
-	, http = require('./wagner.http')
+var http = require('./wagner.http')
 
-function NulloValidationResponse() {
-	if(!(this instanceof NulloValidationResponse)) {
-		return new NulloValidationResponse()
-	}
+module.exports = function(options) {
+	options = options || {}
 
-	var me = this
-	process.nextTick(function() {
-		me.emit('validated')
-	})
-	events.EventEmitter2.call(this)
-}
-util.inherits(NulloValidationResponse, events.EventEmitter2)
+	if(options.ignoreDefaultFormSubmit) return
 
-function HttpFormSubmissionResponse(formVals) {
-	if(!(this instanceof HttpFormSubmissionResponse)) {
-		return new HttpFormSubmissionResponse(formVals)
-	}
+	var component = this
+		, $form = component._$root
+		, method = $form.attr('method').toLowerCase()
+		, action = $form.attr('action')
 
-	var me = this
-
-	events.EventEmitter2.call(this)
-
-	http[formVals.method](formVals.action, formVals.data, function(res) {
-		var resData = ''
-
+	function processFormResponse(res) {
 		res.on('data', function(data) {
-			resData += data
-			me.emit('data', data)
+			component.emit('submission data', data)
+		})
+
+		res.on('end', function(result) {
+			component.emit('submission result', result)
 		})
 
 		res.on('error', function() {
-			me.emit('error')
-		})
-		
-		res.on('end', function() {
-			me.emit('end', resData && JSON.parse(resData))
+			component.emit('submission error')
 		})
 
-		if(res.statusCode === 401) {
-			//self.emit('unauthenticated')
-			console.log('unauthenticated')
-		}
-	})
-}
-util.inherits(HttpFormSubmissionResponse, events.EventEmitter2)
-
-
-
-module.exports = function(options) {
-	var component = this
-		, $root = component._$root
-	options = options || {}
-
-	component.validate = component.validate || NulloValidationResponse
-	component.submissionResponse = component.submissionResponse || HttpFormSubmissionResponse
-
-	function performSubmission($form) {
-		function submitForm() {
-			var method = $form.attr('method').toLowerCase()
-				, action = $form.attr('action')
-				, data = objectize($form)
-				, res = component.submissionResponse({
-					  action: action
-					, data: data
-					, method: method
-					})
-			component.emit('submitted', res)
-		}
-
-	  component.emit('submitting')
-
-		var validator = component.validate()
-		validator.once('validating', function() {
-			component.emit('validating')
-		})
-		validator.once('validated', function(data) {
-			component.emit('validated', data)
-			submitForm()
-		})
-		validator.once('invalidated', function(result) {
-			component.emit('invalidated')
-		})
+		component.emit('submitted')
 	}
 
-	$root.submit(function(evt) {
-	  var $form = $(evt.target).closest('form')
-	  if(!$form.length) return
+	function submitForm(data) {
+		http[method](action, data, processFormResponse)
+	}
 
+	$form.submit(function(evt) {
 		evt.preventDefault()
 	  if($form.hasClass('submitting') || $form.hasClass('submitted')) return
-	  performSubmission($form)
+
+	  component.emit('submitting')
 	})
-	return this
+
+	component.on('validated', submitForm)
 }

@@ -1,5 +1,6 @@
 var util = require('util')
 	, events = require('eventemitter2')
+	, objectize = require('./objectizeForm')
 	, async = require('async')
 	, moment = require('moment')
 	, sarastro = require('sarastro')
@@ -33,7 +34,8 @@ var typeValidators = {
 				deferredResult(isValid, cb)
 			}
 		, string: function(potentialString, cb) {
-				var isValid = Object.prototype.toString.call(potentialString) === '[object String]'
+				var isString = Object.prototype.toString.call(potentialString) === '[object String]'
+				isValid = isString && !whitespaceOnly.test(potentialString)
 				deferredResult(isValid, cb)
 			}
 		}
@@ -83,6 +85,16 @@ function shouldValidate(schemaEntry, val) {
 	if(!isRequired && hasValue(val)) return true
 }
 
+function NulloValidationResponse(form) {
+	var me = this
+	process.nextTick(function() {
+		me.emit('validated', objectize(form))
+	})
+	events.EventEmitter2.call(me)
+}
+util.inherits(NulloValidationResponse, events.EventEmitter2)
+
+
 function FieldValidationResponse(form, schema, messageValidator) {
 	var me = this
 		, validatorArgs
@@ -115,6 +127,7 @@ function FieldValidationResponse(form, schema, messageValidator) {
 			} else {
 				me.emit('validated', result.data)
 			}
+			me.removeAllListeners()
 		}
 
 		function getResultDataValue(name) {
@@ -169,12 +182,30 @@ function FieldValidationResponse(form, schema, messageValidator) {
 util.inherits(FieldValidationResponse, events.EventEmitter2)
 
 
-module.exports = function() {
-	var component = this
+module.exports = function(options) {
+	options = options || {}
 
-	component.validate = function() {
-		return new FieldValidationResponse(component._root, component._schema, component._validate)
+	var component = this
+		, form = component._root
+		, schema = options.schema
+		, validate = options.validate
+		, ValidationResponse = !!schema ? FieldValidationResponse : NulloValidationResponse
+
+	function validateComponent() {
+		var validator = new ValidationResponse(form, schema, validate)
+
+		validator.once('validating', function() {
+			component.emit('validating')
+		})
+
+		validator.once('validated', function(data) {
+			component.emit('validated', data)
+		})
+
+		validator.once('invalidated', function(result) {
+			component.emit('invalidated', result)
+		})
 	}
 
-	return component
+	component.on('submitting', validateComponent)
 }

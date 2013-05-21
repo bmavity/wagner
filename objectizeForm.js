@@ -1,4 +1,6 @@
-function objectize($form) {
+function objectize(form) {
+	$form = $(form)
+
 	var $textEles = $form.find('input:not([type="button"], [type="submit"], [type="checkbox"], [type="radio"]), textarea')
 		, $checkboxEles = $form.find('input[type="checkbox"]')
 		, $radioEles = $form.find('input[type="radio"]')

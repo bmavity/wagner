@@ -38,20 +38,7 @@ module.exports = function(opts) {
 	component.state('wagner.form.submitting', {
 	  _onEnter: disableSubmit
 	, 'validating': 'wagner.form.validating'
-	, 'submitted': function(res) {
-			res.on('data', function(data) {
-				component.emit('submission data', data)
-			})
-
-			res.on('end', function(result) {
-				component.emit('submission result', result)
-			  component.transition('wagner.form.default')
-			})
-
-			res.on('error', function() {
-				component.emit('submission error')
-			  component.transition('wagner.form.default')
-			})
-		}
+	, 'submission error': 'wagner.form.default'
+	, 'submission result': 'wagner.form.default'
 	})
 }
