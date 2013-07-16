@@ -25,10 +25,9 @@ function knockoutDataBinder(options) {
 	options = options || {}
 	
 	function createViewModel(obj) {
+		viewModel = mapping.fromJS(obj)
 		if(options.bindMapping) {
-			viewModel = mapping.fromJS(obj, options.bindMapping)
-		} else {
-			viewModel = mapping.fromJS(obj)
+			viewModel = mapping.fromJS(obj, options.bindMapping, viewModel)
 		}
 		ko.applyBindings(viewModel, root)
 		if(options.notifyOn) {
