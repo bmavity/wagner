@@ -14,6 +14,7 @@
 , "description": "Portable Components"
 , "dependencies": {
 		"eventemitter2": "0.4.x"
+	, "hammerjs": "1.0.x"
 	, "knockout": "2.3.x"
 	, "machina": "0.3.x"
 	, "sarastro": "0.0.x"
