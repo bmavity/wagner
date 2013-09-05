@@ -37,7 +37,6 @@ module.exports = function(opts) {
 	    , $match
 			, matchingHandler
 
-		console.log(evt, $target)
 		if(!opts.captureSubmitClick) {
 			if($target.attr('type') === 'submit') {
 				return
