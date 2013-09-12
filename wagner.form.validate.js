@@ -209,3 +209,4 @@ module.exports = function(options) {
 
 	component.on('submitting', validateComponent)
 }
+module.exports.FieldValidationResponse = FieldValidationResponse
