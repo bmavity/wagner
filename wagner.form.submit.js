@@ -1,13 +1,7 @@
 var http = require('./wagner.http')
 
-module.exports = function(options) {
-	options = options || {}
-
-	if(options.ignoreDefaultFormSubmit) return
-
-	var component = this
-		, $form = component._$root
-		, method = $form.attr('method').toLowerCase()
+function submitForm($form, data, component) {
+	var method = $form.attr('method').toLowerCase()
 		, action = $form.attr('action')
 
 	function processFormResponse(res) {
@@ -26,9 +20,16 @@ module.exports = function(options) {
 		component.emit('submitted')
 	}
 
-	function submitForm(data) {
-		http[method](action, data, processFormResponse)
-	}
+	http[method](action, data, processFormResponse)
+}
+
+module.exports = function(options) {
+	options = options || {}
+
+	if(options.ignoreDefaultFormSubmit) return
+
+	var component = this
+		, $form = component._$root
 
 	$form.submit(function(evt) {
 		evt.preventDefault()
@@ -37,5 +38,8 @@ module.exports = function(options) {
 	  component.emit('submitting')
 	})
 
-	component.on('validated', submitForm)
+	component.on('validated', function(data) {
+		submitForm($form, data, component)
+	})
 }
+module.exports.submitForm = submitForm
