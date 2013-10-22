@@ -12,44 +12,41 @@ ko.bindingHandlers.state = {
 	}
 }
 
-function oi(obj, cb) {
-	Object.keys(obj).forEach(function(key) {
-		cb(obj[key], key)
-	})
-}
-
 function knockoutDataBinder(options) {
 	var handlers = {}
 		, root = this._root
 		, viewModel
+		, wasApplied
 	options = options || {}
+
+	function ensureBindings() {
+		if(wasApplied) return
+		ko.applyBindings(viewModel, root)
+		wasApplied = true
+	}
 	
 	function createViewModel(obj) {
-		viewModel = mapping.fromJS(obj)
 		if(options.bindMapping) {
-			viewModel = mapping.fromJS(obj, options.bindMapping, viewModel)
-		}
-		ko.applyBindings(viewModel, root)
-		if(options.notifyOn) {
-			oi(options.notifyOn, function(fn, key) {
-				viewModel[key].subscribe(fn)
-			})
+			viewModel = mapping.fromJS(obj, options.bindMapping)
+		} else {
+			viewModel = mapping.fromJS(obj)
 		}
 	}
 
 	function ensureViewModel(schema) {
 		if(!viewModel) {
-			createViewModel(schema)
+			if(options.bindWith) {
+				createViewModel(options.bindWith)
+			} else {
+				createViewModel(schema)
+			}
 		}
 	}
 
 	function update(values) {
 		ensureViewModel(values)
 		mapping.fromJS(values, viewModel)
-	}
-
-	if(options.bindWith) {
-		createViewModel(options.bindWith)
+		ensureBindings()
 	}
 
 	this.update = update
@@ -64,7 +61,7 @@ knockoutDataBinder.obj = function(val) {
 	return ko.observable(val)
 }
 
-knockoutDataBinder.mapping = mapping
-
 
 module.exports = knockoutDataBinder
+module.exports.ko = ko
+module.exports.mapping = mapping
